@@ -5,8 +5,7 @@ driver mutations, translocations and mutational signatures.
 
 Built for **whole-genome sequencing**: allele-specific, purity- and
 ploidy-corrected copy number (ASCAT, Battenberg, FACETS) plus somatic SNVs.
-`checkCNV()` verifies your input meets that before you run anything — see
-[Input QC](#input-qc).
+`checkCNV()` verifies your input meets that before you run anything.
 
 This is the reference implementation of the classification published in:
 
