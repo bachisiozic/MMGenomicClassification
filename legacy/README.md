@@ -22,14 +22,3 @@ They will not work outside the machine they were written on:
 - Both open with 25 `library()` calls, ten of them for packages no function uses.
 
 Use `../R/` instead, via `../MMGenomicClassification.R`.
-
-## They also contain two defects that changed results
-
-Both are fixed in `../R/`, with an opt-out to reproduce the behaviour here:
-
-- Hyperdiploidy was called by comparing gain fractions as text, so a gain under
-  about 1e-4 of a chromosome scored as a whole-chromosome gain.
-- The additional-gains burden summed a feature the pipeline had already dropped,
-  so it was always 0 and the `HRD_Gains` group could never be assigned.
-
-`../docs/KNOWN_ISSUES.md` has the detail, including how to switch each one back.
