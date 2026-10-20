@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite both the software itself and the paper
+  that describes the classification it implements.
+title: MMGenomicClassification
+abstract: >-
+  Reference implementation of the genomic classification of multiple myeloma into
+  eleven groups from copy number, driver mutations, translocations and mutational
+  signatures. Supports hg19, hg38 and mm10.
+type: software
+license: MIT
+authors:
+  - family-names: Ziccheddu
+    given-names: Bachisio
+repository-code: "https://github.com/OWNER/MMGenomicClassification"
+keywords:
+  - multiple myeloma
+  - genomic classification
+  - copy number
+  - mutational signatures
+  - bioinformatics
+references:
+  - type: article
+    scope: >-
+      Cite this paper when reporting results produced with this software.
+    authors:
+      - family-names: Maura
+        given-names: Francesco
+      - family-names: Rustad
+        given-names: Even H
+      - family-names: Boyle
+        given-names: Eileen M
+    title: >-
+      Genomic Classification and Individualized Prognosis in Multiple Myeloma
+    journal: Journal of Clinical Oncology
+    doi: 10.1200/JCO.23.01277

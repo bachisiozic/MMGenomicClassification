@@ -1,0 +1,14 @@
+code	human_target
+Amp_1q21.1	MCL1
+Amp_1q21.3	CKS1B
+Amp_8q24.21	MYC
+Del_8q24.21	MYC
+Del_1p32.3	CDKN2C
+Del_1p22.1	RPL5
+Del_1p12	TENT5C
+Del_17p13.1	TP53
+Del_13q14.2	RB1
+Del_14q32.33	TRAF3
+Del_16q12.1	CYLD
+Del_11q22.1	BIRC3
+Del_12p13.2	ETV6
