@@ -10,7 +10,7 @@ ploidy-corrected copy number (ASCAT, Battenberg, FACETS) plus somatic SNVs.
 
 This is the reference implementation of the classification published in:
 
-> Maura F, Rustad EH, Boyle EM, et al. **Genomic Classification and Individualized
+> Maura F, Rajanna AR, Ziccheddu B, et al. **Genomic Classification and Individualized
 > Prognosis in Multiple Myeloma.** *Journal of Clinical Oncology*.
 > doi:[10.1200/JCO.23.01277](https://doi.org/10.1200/JCO.23.01277)
 
@@ -65,25 +65,6 @@ A complete, runnable script is in
 [docs/PIPELINE.md](docs/PIPELINE.md) for what each step actually computes and
 [docs/INPUT_FORMATS.md](docs/INPUT_FORMATS.md) for the exact columns expected.
 
-### Input QC
-
-Run `checkCNV()` on the output of `inputCNV()` before anything else. Every
-threshold in the pipeline is an **absolute copy number** — gain at `total >= 2.5`,
-loss below `1.5` — so it assumes calls already corrected for purity and ploidy, and
-it assumes the minor allele is present. Three failures are otherwise silent:
-
-- **No minor allele.** A segment with `minor = NA` can never satisfy `minor >= 0.5`,
-  so the sample comes back non-hyperdiploid rather than unassessable. This is what
-  array or panel data looks like mixed into a WGS cohort.
-- **Overlapping segments.** Gained bases are summed per arm, so overlap
-  double-counts them and inflates the gained fraction — a chromosome can pass the
-  60% threshold on far less than 60% of real coverage. Allele-specific WGS callers
-  emit disjoint segments.
-- **Uncorrected ploidy.** A sample sitting at total copy number 20 is "gained" on
-  every chromosome and comes out hyperdiploid automatically.
-
-`checkCNV()` reports all three per sample, plus genome coverage and malformed
-segments, and recommends the right `REQUIRE.MINOR.ALLELE` setting for the cohort.
 
 ### What you must supply yourself
 
@@ -98,8 +79,7 @@ have to be merged into the matrix before `MMGenoCla()`:
   [dndscv](https://github.com/im3sanger/dndscv) `annotmuts` output, filtered to
   non-synonymous.
 
-`MMGenoCla()` drops any sample with a missing feature, so gaps in these cost you
-whole samples.
+`MMGenoCla()` drops any sample with a missing feature.
 
 ---
 
@@ -107,7 +87,7 @@ whole samples.
 
 | Group | Defined by |
 |---|---|
-| `HRD_RAS` | hyperdiploid, MAPK/FGFR3 mutant, otherwise quiet |
+| `HRD_RAS` | hyperdiploid, RAS mutations, otherwise quiet |
 | `HRD_Gains` | hyperdiploid with additional recurrent gains |
 | `HRD_Complex_Cytogenetic` | hyperdiploid with a high deletion burden |
 | `CCND1_Simple` | t(11;14), low complexity |
@@ -159,8 +139,7 @@ legacy/                       the original scripts, exactly as published
 
 Everything needed ships in `reference/` — about 11 MB, no external downloads and
 no Git LFS. The UCSC gene tables are shipped as the four columns the pipeline
-reads (`chrom`, `txStart`, `txEnd`, `geneSymbol`), which is what brings the hg38
-table down from 78 MB to 7.6 MB. Row order is preserved, so the transcript chosen
+reads (`chrom`, `txStart`, `txEnd`, `geneSymbol`). Row order is preserved, so the transcript chosen
 per gene is unchanged; `scripts/build_slim_gene_references.R` regenerates them
 from the full UCSC dumps.
 
@@ -172,37 +151,8 @@ from the full UCSC dumps.
 `JCO_GenomicClassification_hg38.R` and `RUN_JCO_Genomic_Classification.R`
 unmodified, so published results stay reproducible.
 
-The version in `R/` is the same analysis, reorganised: the two near-duplicate
-2,300-line files became one build-aware implementation, reference paths are
-resolved from the build instead of hardcoded, and `APOBECanalyzer()` no longer
-depends on a privately patched copy of mmsig at an absolute path.
+The version in `R/` is the same analysis, reorganised.
 
-**It is validated against the paper's own cohort.** Out of the box it reproduces
-**98.78% of the published feature matrix** cell for cell, and **99.03%** with
-`REQUIRE.MINOR.ALLELE = "non-HRD"` — including 99.99% of the driver mutations and
-99.87% of the APOBEC bins from independently refitted signatures.
-[docs/VALIDATION.md](docs/VALIDATION.md) has the full accounting.
-
-Defects in the published code that changed results are fixed here, each with an
-opt-out. One behaviour is left as published by default but exposed as a setting:
-
-- Hyperdiploidy requires the minor allele to be retained, so `3+0` gains do not
-  count — but the published matrix counts them. This stays as published by
-  default; `HYidentification(REQUIRE.MINOR.ALLELE = "non-HRD")` scores trisomies
-  on total copy number alone and reproduces the published matrix at 99.99% against
-  96.49%. The default now warns when samples carry no minor-allele values at all,
-  which otherwise makes them look diploid.
-- Hyperdiploidy was also called by comparing gain fractions as *text*, so a gain
-  under ~1e-4 of a chromosome scored as a whole-chromosome gain.
-  `HYidentification(LEGACY.STRING.COMPARISON = TRUE)` restores it.
-- The additional-gains burden summed a feature `FinalMatrixGenerator()` drops, so
-  it was always 0 and `HRD_Gains` could not be assigned.
-  `MMGenoCla(LEGACY.ADD.GAINS = TRUE)` restores it.
-
-[docs/KNOWN_ISSUES.md](docs/KNOWN_ISSUES.md) documents these and the smaller fixes
-in full, with what each one affects.
-
----
 
 ## Citation
 
@@ -210,7 +160,7 @@ If you use this, please cite the paper:
 
 ```bibtex
 @article{Maura2023MMGenomicClassification,
-  author  = {Maura, Francesco and Rustad, Even H and Boyle, Eileen M and others},
+  author  = {Maura, Francesco and Rajanna, Arjun R and Ziccheddu, Bachisio and others},
   title   = {Genomic Classification and Individualized Prognosis in Multiple Myeloma},
   journal = {Journal of Clinical Oncology},
   doi     = {10.1200/JCO.23.01277}
